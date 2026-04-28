@@ -193,12 +193,12 @@ export default function LearnPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-white text-amber-900 font-bold px-6 py-3 rounded-full hover:bg-amber-50 transition-colors shadow-md text-sm">
+            <Link href="/learn/cherry" className="bg-white text-amber-900 font-bold px-6 py-3 rounded-full hover:bg-amber-50 transition-colors shadow-md text-sm text-center">
               🍒 チェリーの構造を学ぶ
-            </button>
-            <button className="bg-amber-700/60 text-white font-bold px-6 py-3 rounded-full hover:bg-amber-700/80 transition-colors border border-amber-500/50 text-sm">
+            </Link>
+            <Link href="/learn/processing-simulator" className="bg-amber-700/60 text-white font-bold px-6 py-3 rounded-full hover:bg-amber-700/80 transition-colors border border-amber-500/50 text-sm text-center">
               ☀️ 精製方法シミュレーターへ
-            </button>
+            </Link>
           </div>
         </section>
 
