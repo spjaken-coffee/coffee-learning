@@ -3,628 +3,748 @@
 import Link from 'next/link'
 import { useState } from 'react'
 
-import { APP_NAME } from '@/lib/brand'
+import { APP_NAME, APP_SUBTITLE } from '@/lib/brand'
 
-type LayerId = 'skin' | 'pulp' | 'mucilage' | 'parchment' | 'bean'
+type PartId = 'skin' | 'pulp' | 'mucilage' | 'parchment' | 'silverSkin' | 'bean'
 
-interface Layer {
-  id: LayerId
+type CherryPart = {
+  id: PartId
   number: string
   name: string
+  shortName: string
   color: string
-  highlight: string
-  gradId: string
+  accent: string
+  chip: string
+  ringStroke?: string
   summary: string
   role: string
   processing: string
-  tasteEffect: string
+  taste: string
   tip: string
+  focus: string
 }
 
-const LAYERS: Layer[] = [
+const CHERRY_PARTS: CherryPart[] = [
   {
     id: 'skin',
     number: '01',
     name: '外皮',
-    color: '#bf3626',
-    highlight: '#ff7a65',
-    gradId: 'g-skin',
-    summary: '熟すと赤や黄色になる、チェリーの一番外側の薄い皮。収穫の判断はここから始まる。',
-    role: '果実の内部を乾燥・外敵から守る保護層。熟度のバロメーターとして収穫タイミングの基準になる。',
-    processing: 'すべての精製方法で最終的に除去される。ウォッシュドでは収穫直後に機械で剥ぎ取る。',
-    tasteEffect: '直接の風味への影響は少ないが、収穫タイミング（熟度）が豆全体の甘み・酸のバランスを左右する。',
-    tip: '「赤くなったら飲み頃」はコーヒーチェリーにも当てはまる。熟した果実を選ぶことが美味しさの第一歩。',
+    shortName: '外皮',
+    color: '#b93427',
+    accent: '#ff8a73',
+    chip: '熟度の入口',
+    summary: '熟度を知らせる赤い皮。収穫タイミングの判断に直結する、いちばん外側のサインです。',
+    role: '雨風や乾燥から内部を守りつつ、熟したチェリーを見分ける視覚的な目印になります。',
+    processing: 'どの精製でも最終的には外しますが、ここで見極めた熟度が後の精製品質を大きく左右します。',
+    taste: '皮そのものより、「熟した実を選べたか」が甘み、酸の透明感、未熟感の有無に影響します。',
+    tip: 'まずは色を見る。赤が深く、張りがあるチェリーほど学習の出発点として分かりやすいです。',
+    focus: '収穫の判断が味の土台になることを意識して見ます。',
   },
   {
     id: 'pulp',
     number: '02',
     name: '果肉',
-    color: '#c94820',
-    highlight: '#ff9060',
-    gradId: 'g-pulp',
-    summary: '甘みと水分を含む厚みのある果肉。チェリーらしい果実感の中心となる層。',
-    role: '糖分・有機酸を豊富に含む。精製中にどれだけ残すか・いつ除くかで豆の風味が大きく変わる。',
-    processing: 'ナチュラルでは乾燥中もそのまま残す。ウォッシュドでは機械パルピングで収穫後すぐに除去する。',
-    tasteEffect: 'ナチュラル精製では果肉の糖分が豆へ移行し、フルーティーな甘みや豊かな発酵感を生む。',
-    tip: 'マンゴーやベリーを感じるコーヒーは、この果肉が仕事をした証拠かもしれない。',
+    shortName: '果肉',
+    color: '#cf5a2b',
+    accent: '#ffb07c',
+    chip: '果実感の源',
+    summary: '厚みのある果肉層。チェリーらしい甘さ、水分、果実感を強く持つ部分です。',
+    role: '糖分や有機酸を含み、乾燥や発酵の過程で豆にどんな果実感が移るかを左右します。',
+    processing: 'ナチュラルでは長く豆の近くに残り、ウォッシュドでは早い段階で取り除かれます。',
+    taste: '長く残すほどベリー感や発酵由来の甘さが出やすく、早く外すほどすっきり整いやすくなります。',
+    tip: 'フルーティーなコーヒーを飲んだら、この果肉がどれだけ関わったかを想像すると整理しやすいです。',
+    focus: '果実の甘さが豆に近づく層として見ます。',
   },
   {
     id: 'mucilage',
     number: '03',
     name: 'ミューシレージ',
-    color: '#c09010',
-    highlight: '#f0c840',
-    gradId: 'g-mucilage',
-    summary: '果肉の内側にある糖分を多く含んだ半透明の粘液質の層。触るとねっとりしている。',
-    role: '糖分の貯蔵庫。乾燥中に残す量を調整することで、甘みと複雑さを段階的にコントロールできる。',
-    processing: 'ハニー精製の主役。残す量の違いがイエロー・レッド・ブラックハニーの風味の差を生む。',
-    tasteEffect: '残量が多いほど甘みと質感が増す。少ないほどクリーンでクリスプな味わいに仕上がる。',
-    tip: 'ハニープロセスのコーヒーに感じる「はちみつのようなとろみ感」は、この層が働いた結果。',
+    shortName: 'ミューシレージ',
+    color: '#d7a22a',
+    accent: '#ffe287',
+    chip: '甘みの調整役',
+    ringStroke: '#f6d365',
+    summary: '果肉の内側にある半透明の粘液質。糖分が多く、精製設計の差が最も見えやすい層です。',
+    role: '糖分の残し方を細かく調整できるため、甘さ、質感、発酵感の出方をコントロールしやすい層です。',
+    processing: 'ハニー精製の主役で、どれだけ残すかによって黄色、赤、黒ハニーの印象差が生まれます。',
+    taste: '残す量が多いほどとろみや甘さが増し、少ないほどクリアで輪郭のある味になりやすいです。',
+    tip: 'ハニー精製を理解したいときは、まずこの層を見れば全体像をつかみやすくなります。',
+    focus: '「残す量で味が変わる」代表選手として見ます。',
   },
   {
     id: 'parchment',
     number: '04',
     name: 'パーチメント',
-    color: '#a88858',
-    highlight: '#d8b878',
-    gradId: 'g-parchment',
-    summary: '生豆を包む薄くて硬い殻。乾燥中に豆を保護し、脱穀工程で最終的に取り除かれる。',
-    role: '乾燥・熟成中に豆を外部環境から守るカプセル。内側の水分と風味成分を適切に保持する役割を持つ。',
-    processing: 'ウォッシュドではミューシレージ除去後もこの殻付きで乾燥させる。スマトラ式（ウェットハル）は半乾燥で早期に除去する独自工程。',
-    tasteEffect: '直接の風味への影響は少ないが、保護層として熟成品質に関与。除去のタイミングが残留水分に影響する。',
-    tip: '「パーチメントコーヒー」として流通することもあり、この状態での保存性が最も高い。',
+    shortName: 'パーチメント',
+    color: '#c4a171',
+    accent: '#f0d4a2',
+    chip: '乾燥中の殻',
+    ringStroke: '#ead0aa',
+    summary: '生豆を包む薄い殻。乾燥や保管の間、豆を守る保護カプセルのような存在です。',
+    role: '水分変化を急激にしすぎず、乾燥と熟成の安定に貢献します。',
+    processing: 'ウォッシュドではこの殻付きで乾燥し、脱穀の直前に外します。ウェットハルでは外すタイミングが早いです。',
+    taste: '直接味を生む層ではありませんが、乾燥や保管の安定性を通して品質とクリーンさに関わります。',
+    tip: '見た目は地味でも、豆を守る工程管理の要です。',
+    focus: '味そのものより、品質を守る仕組みとして見ます。',
+  },
+  {
+    id: 'silverSkin',
+    number: '05',
+    name: 'シルバースキン',
+    shortName: 'シルバースキン',
+    color: '#ddd3c7',
+    accent: '#fff9ef',
+    chip: '極薄の膜',
+    ringStroke: '#f7efe3',
+    summary: 'パーチメントの内側にある、さらに薄い膜。焙煎時にチャフとしてはがれ落ちる部分です。',
+    role: '生豆の表面をぴったり包み、微細な保護膜として機能します。',
+    processing: '精製後も生豆に残り、焙煎時の熱で剥がれて排出されます。精製より焙煎で意識されやすい層です。',
+    taste: '味に直接大きく出るわけではありませんが、焙煎時のチャフ量や熱の当たり方の理解につながります。',
+    tip: '薄すぎて見逃しやすいので、図で位置関係をつかむのがいちばん早いです。',
+    focus: 'パーチメントと生豆の間の薄い境界として見ます。',
   },
   {
     id: 'bean',
-    number: '05',
+    number: '06',
     name: '生豆',
-    color: '#487840',
-    highlight: '#80c870',
-    gradId: 'g-bean',
-    summary: '焙煎前のコーヒー豆。外皮・果肉をすべて取り除いた後に残る2粒の種子。',
-    role: '焙煎によって化学変化が起き、香り・甘み・酸・苦みが初めて生成される。すべての加工の最終目的地。',
-    processing: 'どの精製方法をとっても最終的にここにたどり着く。ただし精製方法の違いが豆に「記憶」され、風味特性として残る。',
-    tasteEffect: '焙煎度・品種・産地・精製方法の組み合わせが、カップに現れるすべての風味を決定する。',
-    tip: '生豆は青臭く無味。焙煎によってはじめてあの香りと味が生まれる。旅の終着点。',
+    shortName: '生豆',
+    color: '#6f8f4b',
+    accent: '#c8e39c',
+    chip: '焙煎前の種子',
+    summary: '焙煎前のコーヒー豆。ここまで残った種子が、焙煎で香りと味を獲得します。',
+    role: '産地、品種、精製の情報を持ったまま焙煎へ渡される、味づくりの主役です。',
+    processing: 'どの精製でも最終的にここへ到達しますが、途中の処理の違いが生豆の個性として残ります。',
+    taste: '焙煎後の酸味、甘み、質感、香りの出方は、この生豆がどんな履歴を持っているかで変わります。',
+    tip: 'ゴールは生豆ですが、味の理由はその外側の層にも残っています。',
+    focus: '外の層が何を残したか、その結果として見るとつながります。',
   },
 ]
 
-interface CheryDiagramProps {
-  selected: LayerId
-  onSelect: (id: LayerId) => void
+const CALL_OUTS: Record<PartId, { x1: number; y1: number; x2: number; y2: number }> = {
+  skin: { x1: 330, y1: 106, x2: 404, y2: 84 },
+  pulp: { x1: 314, y1: 148, x2: 402, y2: 138 },
+  mucilage: { x1: 300, y1: 188, x2: 404, y2: 194 },
+  parchment: { x1: 286, y1: 228, x2: 404, y2: 248 },
+  silverSkin: { x1: 272, y1: 266, x2: 402, y2: 300 },
+  bean: { x1: 250, y1: 316, x2: 394, y2: 352 },
 }
 
-function CherryDiagram({ selected, onSelect }: CheryDiagramProps) {
-  const cx = 176
-  const cy = 206
-
-  function opacity(id: LayerId) {
-    return selected === id ? 1 : 0.38
-  }
-
-  function strokeProps(id: LayerId, layer: Layer) {
-    if (selected !== id) return { stroke: 'none', strokeWidth: 0 }
-    return { stroke: layer.highlight, strokeWidth: 5 }
-  }
-
-  function filterAttr(id: LayerId) {
-    return selected === id ? 'url(#glow)' : undefined
-  }
-
-  const skin = LAYERS[0]
-  const pulp = LAYERS[1]
-  const muc = LAYERS[2]
-  const parch = LAYERS[3]
-  const bean = LAYERS[4]
+function CherryCutaway({
+  selected,
+  onSelect,
+}: {
+  selected: PartId
+  onSelect: (id: PartId) => void
+}) {
+  const selectedPart = CHERRY_PARTS.find((part) => part.id === selected)!
 
   return (
     <svg
-      viewBox="0 0 352 380"
+      viewBox="0 0 460 420"
       className="h-auto w-full"
       aria-label="コーヒーチェリー断面図"
+      role="img"
     >
       <defs>
-        {/* Layer gradients */}
-        <radialGradient id="g-skin" cx="36%" cy="30%" r="70%">
-          <stop offset="0%" stopColor="#f07060" />
-          <stop offset="40%" stopColor="#cc3a28" />
-          <stop offset="100%" stopColor="#7c1a18" />
+        <radialGradient id="bgGlow" cx="48%" cy="42%" r="60%">
+          <stop offset="0%" stopColor="#fff9f0" />
+          <stop offset="100%" stopColor="#efe4d6" />
         </radialGradient>
-        <radialGradient id="g-pulp" cx="38%" cy="34%" r="72%">
-          <stop offset="0%" stopColor="#ffb070" />
-          <stop offset="50%" stopColor="#d85028" />
-          <stop offset="100%" stopColor="#a03018" />
+        <radialGradient id="skinGrad" cx="35%" cy="28%" r="72%">
+          <stop offset="0%" stopColor="#ff8f74" />
+          <stop offset="38%" stopColor="#d84a33" />
+          <stop offset="100%" stopColor="#7c1d18" />
         </radialGradient>
-        <radialGradient id="g-mucilage" cx="44%" cy="40%" r="72%">
-          <stop offset="0%" stopColor="#ffe890" />
-          <stop offset="55%" stopColor="#d4a020" />
-          <stop offset="100%" stopColor="#a07010" />
+        <radialGradient id="pulpGrad" cx="40%" cy="34%" r="70%">
+          <stop offset="0%" stopColor="#ffc18a" />
+          <stop offset="45%" stopColor="#e0713d" />
+          <stop offset="100%" stopColor="#9d3c20" />
         </radialGradient>
-        <radialGradient id="g-parchment" cx="46%" cy="42%" r="70%">
-          <stop offset="0%" stopColor="#f4e0c0" />
-          <stop offset="60%" stopColor="#ccaa70" />
-          <stop offset="100%" stopColor="#a08050" />
+        <radialGradient id="mucilageGrad" cx="50%" cy="40%" r="72%">
+          <stop offset="0%" stopColor="#fff3aa" />
+          <stop offset="55%" stopColor="#edbf46" />
+          <stop offset="100%" stopColor="#c59212" />
         </radialGradient>
-        <radialGradient id="g-silver" cx="50%" cy="46%" r="68%">
-          <stop offset="0%" stopColor="#e8ddd0" />
-          <stop offset="100%" stopColor="#c0b0a0" />
+        <radialGradient id="parchmentGrad" cx="52%" cy="44%" r="72%">
+          <stop offset="0%" stopColor="#faecd0" />
+          <stop offset="55%" stopColor="#d6b280" />
+          <stop offset="100%" stopColor="#aa8156" />
         </radialGradient>
-        <radialGradient id="g-bean" cx="40%" cy="34%" r="76%">
-          <stop offset="0%" stopColor="#b8d8a0" />
-          <stop offset="55%" stopColor="#5e9050" />
-          <stop offset="100%" stopColor="#3a6030" />
+        <radialGradient id="silverGrad" cx="54%" cy="42%" r="70%">
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.95" />
+          <stop offset="100%" stopColor="#d7cdbf" stopOpacity="0.9" />
         </radialGradient>
-
-        {/* Outer shine on the cherry surface */}
-        <radialGradient id="g-shine" cx="32%" cy="26%" r="52%">
-          <stop offset="0%" stopColor="white" stopOpacity="0.42" />
-          <stop offset="60%" stopColor="white" stopOpacity="0.08" />
-          <stop offset="100%" stopColor="white" stopOpacity="0" />
+        <radialGradient id="beanGrad" cx="42%" cy="30%" r="72%">
+          <stop offset="0%" stopColor="#d6eab0" />
+          <stop offset="48%" stopColor="#7aa15a" />
+          <stop offset="100%" stopColor="#496a2d" />
         </radialGradient>
-
-        {/* Glow filter for selected layer */}
-        <filter id="glow" x="-25%" y="-25%" width="150%" height="150%">
+        <radialGradient id="shineGrad" cx="30%" cy="24%" r="40%">
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.55" />
+          <stop offset="60%" stopColor="#ffffff" stopOpacity="0.1" />
+          <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+        </radialGradient>
+        <filter id="surfaceShadow" x="-20%" y="-20%" width="140%" height="160%">
+          <feDropShadow dx="0" dy="16" stdDeviation="18" floodColor="#3b2012" floodOpacity="0.16" />
+        </filter>
+        <filter id="layerGlow" x="-25%" y="-25%" width="150%" height="150%">
           <feGaussianBlur stdDeviation="7" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
-
-        {/* Drop shadow for depth */}
-        <filter id="shadow" x="-10%" y="-5%" width="130%" height="130%">
-          <feDropShadow dx="4" dy="8" stdDeviation="12" floodColor="#2a0e06" floodOpacity="0.28" />
-        </filter>
+        <pattern id="pulpTexture" width="22" height="22" patternUnits="userSpaceOnUse">
+          <circle cx="6" cy="6" r="2" fill="#f8d3aa" opacity="0.45" />
+          <circle cx="15" cy="10" r="1.6" fill="#f7c58f" opacity="0.28" />
+          <circle cx="11" cy="17" r="1.8" fill="#e48752" opacity="0.25" />
+        </pattern>
+        <pattern id="mucilageTexture" width="28" height="28" patternUnits="userSpaceOnUse">
+          <circle cx="7" cy="8" r="2.2" fill="#fff3bd" opacity="0.28" />
+          <circle cx="17" cy="16" r="3" fill="#ffeb9a" opacity="0.22" />
+          <circle cx="22" cy="8" r="1.8" fill="#fffbe7" opacity="0.35" />
+        </pattern>
       </defs>
 
-      {/* Outer drop shadow */}
-      <circle cx={cx} cy={cy} r="152" fill="none" filter="url(#shadow)" />
+      <rect x="0" y="0" width="460" height="420" rx="42" fill="url(#bgGlow)" />
 
-      {/* ── Stem ── */}
-      <path
-        d="M176 56 C174 38 163 26 154 32"
-        stroke="#5a3015"
-        strokeWidth="9"
-        strokeLinecap="round"
-        fill="none"
-      />
-      {/* Leaf */}
-      <path
-        d="M176 58 C182 36 205 20 222 30 C214 46 196 56 176 58 Z"
-        fill="#5c7e32"
-        opacity="0.9"
-      />
-      <path
-        d="M176 58 C190 44 208 36 222 30"
-        stroke="#3d5820"
-        strokeWidth="1.5"
-        fill="none"
-        opacity="0.6"
-      />
-
-      {/* ── Layer 1: Outer Skin ── */}
-      <circle
-        cx={cx}
-        cy={cy}
-        r={148}
-        fill={`url(#${skin.gradId})`}
-        opacity={opacity('skin')}
-        {...strokeProps('skin', skin)}
-        filter={filterAttr('skin')}
-        onClick={() => onSelect('skin')}
-        style={{ cursor: 'pointer', transition: 'opacity 0.3s ease' }}
-      />
-
-      {/* ── Layer 2: Pulp ── */}
-      <circle
-        cx={cx}
-        cy={cy}
-        r={122}
-        fill={`url(#${pulp.gradId})`}
-        opacity={opacity('pulp')}
-        {...strokeProps('pulp', pulp)}
-        filter={filterAttr('pulp')}
-        onClick={() => onSelect('pulp')}
-        style={{ cursor: 'pointer', transition: 'opacity 0.3s ease' }}
-      />
-
-      {/* ── Layer 3: Mucilage ── */}
-      <circle
-        cx={cx}
-        cy={cy}
-        r={96}
-        fill={`url(#${muc.gradId})`}
-        opacity={opacity('mucilage') * 0.9}
-        {...strokeProps('mucilage', muc)}
-        filter={filterAttr('mucilage')}
-        onClick={() => onSelect('mucilage')}
-        style={{ cursor: 'pointer', transition: 'opacity 0.3s ease' }}
-      />
-
-      {/* ── Layer 4: Parchment ── */}
-      <circle
-        cx={cx}
-        cy={cy}
-        r={76}
-        fill={`url(#${parch.gradId})`}
-        opacity={opacity('parchment')}
-        {...strokeProps('parchment', parch)}
-        filter={filterAttr('parchment')}
-        onClick={() => onSelect('parchment')}
-        style={{ cursor: 'pointer', transition: 'opacity 0.3s ease' }}
-      />
-
-      {/* Silver skin — thin decorative ring (not interactive, part of parchment visually) */}
-      <circle
-        cx={cx}
-        cy={cy}
-        r={66}
-        fill="url(#g-silver)"
-        opacity={selected === 'parchment' ? 0.95 : selected === 'bean' ? 0.95 : 0.38}
-        style={{ transition: 'opacity 0.3s ease', pointerEvents: 'none' }}
-      />
-
-      {/* ── Layer 5: Bean (two seeds) ── */}
-      <g
-        opacity={opacity('bean')}
-        onClick={() => onSelect('bean')}
-        style={{ cursor: 'pointer', transition: 'opacity 0.3s ease' }}
-        filter={filterAttr('bean')}
-      >
-        {/* Left bean */}
-        <ellipse
-          cx={cx - 15}
-          cy={cy}
-          rx={27}
-          ry={44}
-          fill={`url(#${bean.gradId})`}
-          {...strokeProps('bean', bean)}
-        />
-        {/* Right bean */}
-        <ellipse
-          cx={cx + 15}
-          cy={cy}
-          rx={27}
-          ry={44}
-          fill={`url(#${bean.gradId})`}
-          {...strokeProps('bean', bean)}
-        />
-        {/* Center crease */}
+      <g filter="url(#surfaceShadow)">
         <path
-          d={`M${cx} ${cy - 42} C${cx - 5} ${cy - 20} ${cx - 5} ${cy + 20} ${cx} ${cy + 42}`}
-          stroke="#2a4e24"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          fill="none"
-          opacity="0.7"
+          d="M192 44 C137 44 89 90 82 147 C76 191 96 243 135 290 C161 322 183 347 193 368 C206 347 226 323 252 294 C292 250 314 196 307 147 C300 89 248 44 192 44 Z"
+          fill="url(#skinGrad)"
         />
-        {/* Bean highlight streaks */}
-        <ellipse cx={cx - 22} cy={cy - 16} rx={7} ry={14} fill="white" opacity="0.14" />
-        <ellipse cx={cx + 22} cy={cy - 16} rx={7} ry={14} fill="white" opacity="0.14" />
+        <path
+          d="M191 73 C155 77 121 100 107 135 C93 169 100 216 126 256 C143 283 161 306 176 333 C181 319 192 304 208 286 C246 243 267 188 260 145 C253 103 225 77 191 73 Z"
+          fill="url(#pulpGrad)"
+        />
+        <path
+          d="M191 101 C166 105 143 123 134 148 C124 173 130 209 147 239 C160 262 172 282 184 303 C191 286 200 272 213 255 C237 223 250 185 246 151 C242 124 221 104 191 101 Z"
+          fill="url(#mucilageGrad)"
+          fillOpacity="0.88"
+        />
+        <path
+          d="M191 129 C174 132 160 145 154 161 C147 178 151 203 163 225 C171 241 180 258 187 274 C193 260 201 248 210 236 C227 213 237 185 235 160 C232 142 216 128 191 129 Z"
+          fill="url(#parchmentGrad)"
+        />
+        <path
+          d="M188 150 C176 152 167 161 164 172 C160 186 164 203 173 219 C179 229 184 239 189 249 C193 240 199 230 206 221 C219 204 226 183 224 168 C222 157 211 149 188 150 Z"
+          fill="none"
+          stroke="url(#silverGrad)"
+          strokeWidth="7"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <g fill="url(#beanGrad)">
+          <path d="M168 159 C151 167 145 191 150 211 C155 229 168 248 184 264 C190 251 199 239 206 230 C213 222 217 213 219 202 C223 182 213 160 194 154 C185 151 176 153 168 159 Z" />
+          <path d="M214 158 C231 166 239 191 234 212 C229 229 216 249 199 265 C193 252 184 239 177 231 C171 223 166 213 164 203 C160 182 169 160 188 154 C197 151 206 152 214 158 Z" />
+        </g>
       </g>
 
-      {/* ── Shine overlay on outer skin ── */}
-      <circle
-        cx={cx}
-        cy={cy}
-        r={148}
-        fill="url(#g-shine)"
-        style={{ pointerEvents: 'none' }}
+      <ellipse cx="182" cy="148" rx="62" ry="50" fill="url(#shineGrad)" opacity="0.72" />
+
+      <path d="M194 43 C192 25 182 15 172 21" stroke="#6b3d18" strokeWidth="9" strokeLinecap="round" fill="none" />
+      <path d="M195 45 C214 19 248 11 276 26 C257 53 221 58 195 45 Z" fill="#5f7f37" />
+      <path d="M198 42 C219 32 245 28 270 27" stroke="#395122" strokeWidth="2" fill="none" opacity="0.55" />
+
+      <InteractiveLayer
+        id="skin"
+        selected={selected === 'skin'}
+        onSelect={onSelect}
+        path="M192 44 C137 44 89 90 82 147 C76 191 96 243 135 290 C161 322 183 347 193 368 C206 347 226 323 252 294 C292 250 314 196 307 147 C300 89 248 44 192 44 Z"
+        stroke={CHERRY_PARTS[0].accent}
+      />
+      <InteractiveLayer
+        id="pulp"
+        selected={selected === 'pulp'}
+        onSelect={onSelect}
+        path="M191 73 C155 77 121 100 107 135 C93 169 100 216 126 256 C143 283 161 306 176 333 C181 319 192 304 208 286 C246 243 267 188 260 145 C253 103 225 77 191 73 Z"
+        stroke={CHERRY_PARTS[1].accent}
+      />
+      <InteractiveLayer
+        id="mucilage"
+        selected={selected === 'mucilage'}
+        onSelect={onSelect}
+        path="M191 101 C166 105 143 123 134 148 C124 173 130 209 147 239 C160 262 172 282 184 303 C191 286 200 272 213 255 C237 223 250 185 246 151 C242 124 221 104 191 101 Z"
+        stroke={CHERRY_PARTS[2].accent}
+      />
+      <InteractiveLayer
+        id="parchment"
+        selected={selected === 'parchment'}
+        onSelect={onSelect}
+        path="M191 129 C174 132 160 145 154 161 C147 178 151 203 163 225 C171 241 180 258 187 274 C193 260 201 248 210 236 C227 213 237 185 235 160 C232 142 216 128 191 129 Z"
+        stroke={CHERRY_PARTS[3].accent}
+      />
+      <InteractiveLayer
+        id="silverSkin"
+        selected={selected === 'silverSkin'}
+        onSelect={onSelect}
+        path="M188 150 C176 152 167 161 164 172 C160 186 164 203 173 219 C179 229 184 239 189 249 C193 240 199 230 206 221 C219 204 226 183 224 168 C222 157 211 149 188 150 Z"
+        stroke={CHERRY_PARTS[4].accent}
+        isOutline
+      />
+      <InteractiveBean selected={selected === 'bean'} onSelect={onSelect} />
+
+      <path
+        d="M192 83 C154 89 124 116 112 151 C100 186 108 229 132 265"
+        fill="none"
+        stroke="url(#pulpTexture)"
+        strokeWidth="22"
+        strokeLinecap="round"
+        opacity="0.32"
+      />
+      <path
+        d="M191 110 C170 114 151 129 144 149 C136 170 142 199 158 225"
+        fill="none"
+        stroke="url(#mucilageTexture)"
+        strokeWidth="20"
+        strokeLinecap="round"
+        opacity="0.35"
       />
 
-      {/* ── Layer indicator dots (right side, 2 o'clock position) ── */}
-      {LAYERS.map((layer, i) => {
-        const angle = -0.55 + i * 0.22
-        const radii = [148, 122, 96, 76, 58]
-        const r = radii[i]
-        const dotX = cx + r * Math.cos(angle)
-        const dotY = cy + r * Math.sin(angle)
-        const isActive = selected === layer.id
+      {CHERRY_PARTS.map((part) => {
+        const callout = CALL_OUTS[part.id]
+        const isActive = part.id === selected
+        const labelWidth = part.shortName.length > 6 ? 124 : 108
         return (
-          <g key={layer.id} style={{ pointerEvents: 'none' }}>
-            <circle
-              cx={dotX}
-              cy={dotY}
-              r={isActive ? 8 : 6}
-              fill={isActive ? layer.highlight : 'white'}
-              stroke={isActive ? layer.highlight : layer.color}
-              strokeWidth={isActive ? 0 : 2}
-              opacity={isActive ? 1 : 0.7}
-              style={{ transition: 'all 0.25s ease' }}
+          <g key={part.id} style={{ pointerEvents: 'none' }}>
+            <path
+              d={`M ${callout.x1} ${callout.y1} C ${callout.x1 + 18} ${callout.y1 - 4} ${callout.x2 - 42} ${callout.y2} ${callout.x2} ${callout.y2}`}
+              fill="none"
+              stroke={isActive ? part.accent : '#b7ab9a'}
+              strokeWidth={isActive ? 3 : 1.8}
+              opacity={isActive ? 1 : 0.8}
             />
-            <text
-              x={dotX}
-              y={dotY + 1}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              fill={isActive ? 'white' : layer.color}
-              fontSize={isActive ? '7' : '6.5'}
-              fontWeight="bold"
-            >
-              {layer.number.slice(-1)}
-            </text>
+            <circle cx={callout.x1} cy={callout.y1} r={isActive ? 6 : 4.5} fill={isActive ? part.accent : '#d7ccbf'} />
+            <g transform={`translate(${callout.x2 + 8}, ${callout.y2 - 16})`}>
+              <rect
+                width={isActive ? labelWidth : labelWidth - 12}
+                height="30"
+                rx="15"
+                fill={isActive ? '#fffaf1' : '#f7f0e7'}
+                stroke={isActive ? part.accent : '#ddd0c1'}
+              />
+              <text x="14" y="13" fill={isActive ? '#3a271a' : '#73675c'} fontSize="9" fontWeight="700" letterSpacing="0.16em">
+                {part.number}
+              </text>
+              <text x="14" y="22" fill={isActive ? '#24180f' : '#574c43'} fontSize="11" fontWeight="700">
+                {part.shortName}
+              </text>
+            </g>
           </g>
         )
       })}
+
+      <g transform="translate(26 330)">
+        <rect width="184" height="58" rx="24" fill="#fffaf1" stroke={selectedPart.accent} strokeWidth="1.5" />
+        <text x="18" y="20" fill="#7f6d5c" fontSize="10" fontWeight="700" letterSpacing="0.18em">
+          NOW VIEWING
+        </text>
+        <text x="18" y="39" fill="#261b12" fontSize="18" fontWeight="700">
+          {selectedPart.name}
+        </text>
+        <text x="18" y="51" fill="#7c6859" fontSize="10.5">
+          {selectedPart.focus}
+        </text>
+      </g>
     </svg>
   )
 }
 
-export default function CherryPage() {
-  const [selected, setSelected] = useState<LayerId>('pulp')
-  const layer = LAYERS.find((l) => l.id === selected)!
+function InteractiveLayer({
+  id,
+  selected,
+  onSelect,
+  path,
+  stroke,
+  isOutline = false,
+}: {
+  id: PartId
+  selected: boolean
+  onSelect: (id: PartId) => void
+  path: string
+  stroke: string
+  isOutline?: boolean
+}) {
+  return (
+    <path
+      d={path}
+      fill={isOutline ? 'none' : 'transparent'}
+      stroke={stroke}
+      strokeWidth={selected ? (isOutline ? 8 : 5) : isOutline ? 10 : 20}
+      strokeOpacity={selected ? 1 : 0}
+      filter={selected ? 'url(#layerGlow)' : undefined}
+      onClick={() => onSelect(id)}
+      style={{ cursor: 'pointer', transition: 'all 180ms ease' }}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  )
+}
+
+function InteractiveBean({
+  selected,
+  onSelect,
+}: {
+  selected: boolean
+  onSelect: (id: PartId) => void
+}) {
+  return (
+    <g
+      onClick={() => onSelect('bean')}
+      style={{ cursor: 'pointer', transition: 'all 180ms ease' }}
+      filter={selected ? 'url(#layerGlow)' : undefined}
+    >
+      <path
+        d="M168 159 C151 167 145 191 150 211 C155 229 168 248 184 264 C190 251 199 239 206 230 C213 222 217 213 219 202 C223 182 213 160 194 154 C185 151 176 153 168 159 Z"
+        fill="transparent"
+        stroke={selected ? '#c8e39c' : 'transparent'}
+        strokeWidth={selected ? 5 : 18}
+        strokeOpacity={selected ? 1 : 0}
+      />
+      <path
+        d="M214 158 C231 166 239 191 234 212 C229 229 216 249 199 265 C193 252 184 239 177 231 C171 223 166 213 164 203 C160 182 169 160 188 154 C197 151 206 152 214 158 Z"
+        fill="transparent"
+        stroke={selected ? '#c8e39c' : 'transparent'}
+        strokeWidth={selected ? 5 : 18}
+        strokeOpacity={selected ? 1 : 0}
+      />
+      <path
+        d="M194 161 C184 175 181 193 183 211 C184 225 188 238 194 250"
+        fill="none"
+        stroke={selected ? '#32511f' : '#45662e'}
+        strokeWidth="3"
+        strokeLinecap="round"
+        opacity="0.8"
+      />
+    </g>
+  )
+}
+
+function CherryDetailCard({ part }: { part: CherryPart }) {
+  const sections = [
+    { label: '役割', body: part.role },
+    { label: '精製との関係', body: part.processing },
+    { label: '味への影響', body: part.taste },
+  ]
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--background)' }}>
-      {/* Sticky compact header */}
+    <article
+      className="rounded-[2rem] border p-5 shadow-[0_20px_50px_rgba(74,47,24,0.08)] md:p-6"
+      style={{
+        background: 'linear-gradient(180deg, rgba(255,251,245,0.98) 0%, rgba(247,240,231,0.96) 100%)',
+        borderColor: 'rgba(119, 91, 68, 0.16)',
+        animation: 'cardFadeIn 220ms ease',
+      }}
+    >
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="text-[11px] font-bold tracking-[0.24em]" style={{ color: 'var(--ink-soft)' }}>
+            SELECTED PART
+          </p>
+          <div className="mt-2 flex items-center gap-3">
+            <span
+              className="inline-flex rounded-full px-3 py-1 text-[11px] font-bold tracking-[0.18em]"
+              style={{ backgroundColor: `${part.color}18`, color: part.color }}
+            >
+              {part.number}
+            </span>
+            <h2 className="text-2xl font-black tracking-tight md:text-[2rem]" style={{ color: 'var(--accent-strong)' }}>
+              {part.name}
+            </h2>
+          </div>
+          <p className="mt-3 max-w-xl text-sm leading-7 md:text-[15px]" style={{ color: 'var(--ink-soft)' }}>
+            {part.summary}
+          </p>
+        </div>
+
+        <div
+          className="min-w-[132px] rounded-[1.5rem] border px-4 py-3"
+          style={{ borderColor: `${part.color}35`, backgroundColor: `${part.color}10` }}
+        >
+          <p className="text-[10px] font-bold tracking-[0.18em]" style={{ color: part.color }}>
+            観察ポイント
+          </p>
+          <p className="mt-2 text-sm font-semibold leading-6" style={{ color: 'var(--accent-strong)' }}>
+            {part.focus}
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-5 grid gap-3">
+        {sections.map((section) => (
+          <section
+            key={section.label}
+            className="rounded-[1.4rem] border bg-white/80 p-4"
+            style={{ borderColor: 'rgba(119, 91, 68, 0.12)' }}
+          >
+            <p className="text-[11px] font-bold tracking-[0.18em]" style={{ color: part.color }}>
+              {section.label}
+            </p>
+            <p className="mt-2 text-sm leading-7 md:text-[15px]" style={{ color: 'var(--foreground)' }}>
+              {section.body}
+            </p>
+          </section>
+        ))}
+      </div>
+
+      <section
+        className="mt-4 rounded-[1.5rem] border px-4 py-4"
+        style={{
+          borderColor: `${part.color}30`,
+          background: `linear-gradient(135deg, ${part.color}12 0%, rgba(255,255,255,0.92) 100%)`,
+        }}
+      >
+        <p className="text-[11px] font-bold tracking-[0.18em]" style={{ color: part.color }}>
+          初心者向けのひと言
+        </p>
+        <p className="mt-2 text-sm leading-7" style={{ color: 'var(--accent-strong)' }}>
+          {part.tip}
+        </p>
+      </section>
+    </article>
+  )
+}
+
+function ChapterActions() {
+  return (
+    <>
+      <div
+        className="rounded-[2rem] border p-5 shadow-[0_16px_40px_rgba(61,39,22,0.06)] md:p-6"
+        style={{ background: 'rgba(255,249,242,0.95)', borderColor: 'var(--border)' }}
+      >
+        <p className="text-[11px] font-bold tracking-[0.2em]" style={{ color: 'var(--ink-soft)' }}>
+          NEXT STEP
+        </p>
+        <h3 className="mt-3 text-xl font-black tracking-tight" style={{ color: 'var(--accent-strong)' }}>
+          ここから精製の理解へつなげる
+        </h3>
+        <p className="mt-3 text-sm leading-7" style={{ color: 'var(--ink-soft)' }}>
+          どの層を残すか、いつ外すかが分かると、精製方法の違いがただの用語ではなく工程の設計として見えてきます。
+        </p>
+        <div className="mt-5 grid gap-3 md:grid-cols-2">
+          <Link
+            href="/learn/processing"
+            className="rounded-[1.4rem] border px-4 py-4 text-sm font-bold transition-transform hover:-translate-y-0.5"
+            style={{ background: 'white', borderColor: 'var(--border)', color: 'var(--accent-strong)' }}
+          >
+            精製方法を比較する
+          </Link>
+          <Link
+            href="/learn/processing-simulator"
+            className="rounded-[1.4rem] px-4 py-4 text-sm font-bold text-white transition-transform hover:-translate-y-0.5"
+            style={{ background: 'linear-gradient(135deg, #2f241c 0%, #5c4738 100%)' }}
+          >
+            シミュレーターで体験する
+          </Link>
+        </div>
+      </div>
+
+      <div className="mt-4 flex items-center justify-between gap-3 rounded-[1.4rem] border px-4 py-3" style={{ borderColor: 'var(--border)', background: 'rgba(252,250,247,0.92)' }}>
+        <Link href="/learn" className="text-sm font-semibold" style={{ color: 'var(--ink-soft)' }}>
+          ← 学習マップへ戻る
+        </Link>
+        <Link href="/learn/processing" className="text-sm font-semibold" style={{ color: 'var(--accent-strong)' }}>
+          次の章へ →
+        </Link>
+      </div>
+
+      <div
+        className="fixed inset-x-0 bottom-0 z-30 border-t px-4 py-3 md:hidden"
+        style={{
+          background: 'rgba(252,250,247,0.94)',
+          borderColor: 'rgba(119, 91, 68, 0.14)',
+          backdropFilter: 'blur(16px)',
+        }}
+      >
+        <div className="mx-auto flex max-w-6xl gap-3">
+          <Link
+            href="/learn"
+            className="flex-1 rounded-full border px-4 py-3 text-center text-sm font-semibold"
+            style={{ borderColor: 'var(--border)', color: 'var(--ink-soft)', background: 'white' }}
+          >
+            学習マップ
+          </Link>
+          <Link
+            href="/learn/processing"
+            className="flex-1 rounded-full px-4 py-3 text-center text-sm font-bold text-white"
+            style={{ background: 'linear-gradient(135deg, #2f241c 0%, #5c4738 100%)' }}
+          >
+            次は精製へ
+          </Link>
+        </div>
+      </div>
+    </>
+  )
+}
+
+export default function CherryPage() {
+  const [selectedPart, setSelectedPart] = useState<PartId>('mucilage')
+  const activePart = CHERRY_PARTS.find((part) => part.id === selectedPart)!
+
+  return (
+    <div className="min-h-screen pb-24 md:pb-10" style={{ background: 'linear-gradient(180deg, #f6f0e6 0%, #efe5d7 100%)' }}>
       <header
         className="sticky top-0 z-20 border-b"
         style={{
-          background: 'rgba(243,238,231,0.92)',
-          backdropFilter: 'blur(12px)',
-          borderColor: 'var(--border)',
+          background: 'rgba(246, 240, 230, 0.9)',
+          borderColor: 'rgba(119, 91, 68, 0.12)',
+          backdropFilter: 'blur(14px)',
         }}
       >
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-          <Link
-            href="/learn"
-            className="flex items-center gap-1.5 text-sm font-semibold"
-            style={{ color: 'var(--ink-soft)' }}
-          >
-            <span className="text-base leading-none">←</span>
-            学習マップへ
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-6">
+          <Link href="/learn" className="text-sm font-semibold" style={{ color: 'var(--ink-soft)' }}>
+            ← 学習マップ
           </Link>
-          <span
-            className="rounded-full px-3 py-1 text-[11px] font-bold tracking-widest"
-            style={{ background: 'var(--surface-muted)', color: 'var(--ink-soft)' }}
-          >
-            CHAPTER 01
-          </span>
+          <div className="text-right">
+            <p className="text-[10px] font-bold tracking-[0.24em]" style={{ color: 'var(--ink-soft)' }}>
+              CHAPTER 01
+            </p>
+            <p className="text-xs font-semibold" style={{ color: 'var(--accent-strong)' }}>
+              チェリーの構造
+            </p>
+          </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 py-6 pb-12 md:px-6 md:py-10">
-        {/* Page title */}
-        <div className="mb-6">
-          <p
-            className="text-[11px] font-bold tracking-[0.28em]"
-            style={{ color: 'var(--ink-soft)' }}
-          >
-            {APP_NAME} &nbsp;/&nbsp; チェリーの構造
-          </p>
-          <h1
-            className="mt-2 text-2xl font-black tracking-tight md:text-3xl"
-            style={{ color: 'var(--accent-strong)' }}
-          >
-            コーヒーチェリーの断面を探る
-          </h1>
-          <p className="mt-1.5 text-sm" style={{ color: 'var(--ink-soft)' }}>
-            部位をタップすると、図解と解説が同時に切り替わる
-          </p>
-        </div>
+      <main className="mx-auto max-w-6xl px-4 py-6 md:px-6 md:py-10">
+        <section
+          className="rounded-[2.2rem] border p-5 shadow-[0_30px_80px_rgba(57,37,22,0.08)] md:p-8"
+          style={{
+            background: 'linear-gradient(135deg, rgba(252,250,247,0.96) 0%, rgba(243,235,224,0.98) 100%)',
+            borderColor: 'rgba(119, 91, 68, 0.14)',
+          }}
+        >
+          <div className="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
+            <div>
+              <p className="text-xs font-bold tracking-[0.32em]" style={{ color: 'var(--ink-soft)' }}>
+                {APP_NAME}
+              </p>
+              <p className="mt-1 text-[11px] uppercase tracking-[0.22em]" style={{ color: '#9b8b7d' }}>
+                {APP_SUBTITLE}
+              </p>
+              <h1 className="mt-4 text-3xl font-black leading-tight tracking-tight md:text-5xl" style={{ color: 'var(--accent-strong)' }}>
+                触った瞬間に、
+                <br />
+                構造と役割がつながる
+              </h1>
+              <p className="mt-4 max-w-2xl text-sm leading-7 md:text-base" style={{ color: 'var(--ink-soft)' }}>
+                コーヒーチェリーを教材ではなく図鑑として再設計しました。図解、選択、解説が一画面で連動し、
+                「今どの部位を見ているか」「精製や味にどう関係するか」を迷わず追えます。
+              </p>
+            </div>
 
-        {/* ── Main two-column layout ── */}
-        <div className="lg:grid lg:grid-cols-[1fr_1fr] lg:gap-8">
-
-          {/* LEFT — Diagram + chips */}
-          <div>
-            {/* SVG diagram card */}
-            <div
-              className="overflow-hidden rounded-[2rem] border"
-              style={{
-                background: 'var(--surface)',
-                borderColor: 'var(--border)',
-                boxShadow: '0 12px 40px rgba(58,28,10,0.10)',
-              }}
-            >
-              {/* Diagram header */}
-              <div
-                className="border-b px-5 py-4"
-                style={{ borderColor: 'var(--border)' }}
-              >
-                <p
-                  className="text-[11px] font-bold tracking-[0.22em]"
-                  style={{ color: 'var(--ink-soft)' }}
+            <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+              {[
+                '1. 図の部位をタップ',
+                '2. すぐ下のチップで切り替え',
+                '3. 同じ画面内で役割と味を確認',
+              ].map((item) => (
+                <div
+                  key={item}
+                  className="rounded-[1.5rem] border px-4 py-4"
+                  style={{ background: 'rgba(255,255,255,0.72)', borderColor: 'rgba(119, 91, 68, 0.12)' }}
                 >
-                  CROSS-SECTION
-                </p>
-                <p className="mt-0.5 text-sm font-bold" style={{ color: 'var(--accent-strong)' }}>
-                  断面図 — 部位をタップして選択
-                </p>
+                  <p className="text-sm font-semibold leading-6" style={{ color: 'var(--accent-strong)' }}>
+                    {item}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-6 rounded-[2.2rem] border p-4 shadow-[0_28px_70px_rgba(62,40,23,0.06)] md:p-6" style={{ background: 'rgba(252,250,247,0.94)', borderColor: 'rgba(119, 91, 68, 0.12)' }}>
+          <div className="grid gap-4 lg:grid-cols-[1.08fr_0.92fr]">
+            <div className="order-1 rounded-[2rem] border p-4 md:p-5" style={{ borderColor: 'rgba(119, 91, 68, 0.12)', background: 'linear-gradient(180deg, #fffaf4 0%, #f2e8da 100%)' }}>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-[11px] font-bold tracking-[0.22em]" style={{ color: 'var(--ink-soft)' }}>
+                    INTERACTIVE CUTAWAY
+                  </p>
+                  <p className="mt-1 text-sm font-semibold" style={{ color: 'var(--accent-strong)' }}>
+                    図解を触ると、選択中の層が発光して説明も切り替わります。
+                  </p>
+                </div>
+                <span
+                  className="rounded-full px-3 py-1 text-[11px] font-bold"
+                  style={{ backgroundColor: `${activePart.color}18`, color: activePart.color }}
+                >
+                  {activePart.shortName}
+                </span>
               </div>
-              <div className="p-4 md:p-6">
-                <CherryDiagram selected={selected} onSelect={setSelected} />
+              <div className="mt-4">
+                <CherryCutaway selected={selectedPart} onSelect={setSelectedPart} />
               </div>
             </div>
 
-            {/* ── Chip buttons ── */}
-            <div className="mt-4">
-              <p
-                className="mb-2.5 text-[11px] font-bold tracking-[0.22em]"
-                style={{ color: 'var(--ink-soft)' }}
-              >
-                部位を選ぶ
-              </p>
-              {/* Mobile: horizontal scroll / Desktop: wrap */}
-              <div className="flex gap-2 overflow-x-auto pb-2 lg:flex-wrap">
-                {LAYERS.map((l) => {
-                  const active = selected === l.id
-                  return (
-                    <button
-                      key={l.id}
-                      onClick={() => setSelected(l.id)}
-                      className="flex-none flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-bold transition-all"
-                      style={
-                        active
-                          ? {
-                              backgroundColor: l.color,
-                              borderColor: l.color,
-                              color: 'white',
-                              boxShadow: `0 4px 14px ${l.color}55`,
-                              transform: 'scale(1.04)',
-                            }
-                          : {
-                              backgroundColor: 'var(--surface)',
-                              borderColor: 'var(--border)',
-                              color: 'var(--ink-soft)',
-                            }
-                      }
-                    >
-                      <span
-                        className="h-2.5 w-2.5 rounded-full"
-                        style={{ backgroundColor: active ? 'rgba(255,255,255,0.8)' : l.color }}
-                      />
-                      <span
-                        className="text-[10px] font-black opacity-60"
-                        style={{ letterSpacing: '0.1em' }}
+            <div className="order-3 lg:order-2">
+              <CherryDetailCard part={activePart} />
+            </div>
+
+            <div className="order-2 lg:order-3 lg:col-span-2">
+              <div className="rounded-[1.8rem] border px-4 py-4 md:px-5" style={{ borderColor: 'rgba(119, 91, 68, 0.12)', background: 'rgba(255,249,242,0.9)' }}>
+                <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+                  <div>
+                    <p className="text-[11px] font-bold tracking-[0.22em]" style={{ color: 'var(--ink-soft)' }}>
+                      LEARNING CHIPS
+                    </p>
+                    <p className="mt-1 text-sm font-semibold" style={{ color: 'var(--accent-strong)' }}>
+                      図のすぐ近くで切り替えて、その場で理解する
+                    </p>
+                  </div>
+                  <p className="text-xs md:text-sm" style={{ color: 'var(--ink-soft)' }}>
+                    横にスワイプしながら、外側から中心へ追えます。
+                  </p>
+                </div>
+
+                <div className="mt-4 flex gap-3 overflow-x-auto pb-1">
+                  {CHERRY_PARTS.map((part) => {
+                    const active = part.id === selectedPart
+                    return (
+                      <button
+                        key={part.id}
+                        type="button"
+                        onClick={() => setSelectedPart(part.id)}
+                        aria-pressed={active}
+                        className="min-w-[160px] flex-none rounded-[1.5rem] border px-4 py-3 text-left transition-all md:min-w-[176px]"
+                        style={
+                          active
+                            ? {
+                                background: `linear-gradient(135deg, ${part.color} 0%, ${part.accent} 100%)`,
+                                borderColor: part.color,
+                                color: '#fffdf8',
+                                boxShadow: `0 10px 24px ${part.color}33`,
+                                transform: 'translateY(-1px)',
+                              }
+                            : {
+                                background: 'white',
+                                borderColor: 'rgba(119, 91, 68, 0.12)',
+                                color: 'var(--accent-strong)',
+                              }
+                        }
                       >
-                        {l.number}
-                      </span>
-                      {l.name}
-                    </button>
-                  )
-                })}
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-[11px] font-bold tracking-[0.18em] opacity-80">{part.number}</span>
+                          <span
+                            className="h-3 w-3 rounded-full"
+                            style={{ backgroundColor: active ? 'rgba(255,255,255,0.75)' : part.color }}
+                          />
+                        </div>
+                        <p className="mt-2 text-base font-bold">{part.name}</p>
+                        <p className="mt-1 text-xs leading-5 opacity-85">{part.chip}</p>
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
             </div>
           </div>
+        </section>
 
-          {/* RIGHT — Description card */}
-          <div className="mt-6 lg:mt-0">
-            <DescriptionCard key={layer.id} layer={layer} />
-
-            {/* Next chapter CTA */}
-            <div
-              className="mt-4 rounded-[1.75rem] border p-5"
-              style={{
-                background: 'var(--accent-strong)',
-                borderColor: 'transparent',
-              }}
-            >
-              <p
-                className="text-[11px] font-bold tracking-[0.22em]"
-                style={{ color: 'rgba(255,255,255,0.5)' }}
-              >
-                NEXT CHAPTER
-              </p>
-              <p className="mt-2 text-sm leading-7 text-stone-200">
-                チェリーの構造が分かると、「どの部位をいつ除くか」という精製方法の選択に意味が見えてくる。
-              </p>
-              <Link
-                href="/learn/processing"
-                className="mt-4 inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-stone-900 transition-colors hover:bg-stone-100"
-              >
-                精製方法へ進む
-                <span className="text-base">→</span>
-              </Link>
-            </div>
-          </div>
-        </div>
+        <section className="mt-6">
+          <ChapterActions />
+        </section>
       </main>
-    </div>
-  )
-}
-
-interface DescriptionCardProps {
-  layer: Layer
-}
-
-function DescriptionCard({ layer }: DescriptionCardProps) {
-  return (
-    <div
-      className="rounded-[2rem] border"
-      style={{
-        background: 'var(--surface)',
-        borderColor: 'var(--border)',
-        boxShadow: '0 12px 40px rgba(58,28,10,0.08)',
-        animation: 'cardFadeIn 0.22s ease-out',
-      }}
-    >
-      {/* Card header with colored band */}
-      <div
-        className="rounded-t-[2rem] p-5 pb-4"
-        style={{ backgroundColor: `${layer.color}18`, borderBottom: `1px solid ${layer.color}30` }}
-      >
-        <div className="flex items-center gap-3">
-          <div
-            className="flex h-10 w-10 flex-none items-center justify-center rounded-full text-sm font-black text-white"
-            style={{ backgroundColor: layer.color }}
-          >
-            {layer.number}
-          </div>
-          <div>
-            <p
-              className="text-[10px] font-bold tracking-[0.24em]"
-              style={{ color: layer.color, opacity: 0.8 }}
-            >
-              LAYER {layer.number}
-            </p>
-            <h2
-              className="text-xl font-black tracking-tight"
-              style={{ color: 'var(--accent-strong)' }}
-            >
-              {layer.name}
-            </h2>
-          </div>
-        </div>
-        <p
-          className="mt-3 text-sm leading-7"
-          style={{ color: 'var(--ink-soft)' }}
-        >
-          {layer.summary}
-        </p>
-      </div>
-
-      {/* Info sections */}
-      <div className="space-y-0 divide-y" style={{ borderColor: 'var(--border)' }}>
-        <InfoRow icon="⚙️" label="役割" text={layer.role} />
-        <InfoRow icon="🔄" label="精製との関係" text={layer.processing} />
-        <InfoRow icon="☕" label="味への影響" text={layer.tasteEffect} />
-        <TipRow text={layer.tip} />
-      </div>
-    </div>
-  )
-}
-
-function InfoRow({ icon, label, text }: { icon: string; label: string; text: string }) {
-  return (
-    <div className="px-5 py-4">
-      <div className="mb-1.5 flex items-center gap-1.5">
-        <span className="text-sm">{icon}</span>
-        <p
-          className="text-[11px] font-bold tracking-[0.18em]"
-          style={{ color: 'var(--ink-soft)' }}
-        >
-          {label}
-        </p>
-      </div>
-      <p className="text-sm leading-7" style={{ color: 'var(--foreground)', opacity: 0.85 }}>
-        {text}
-      </p>
-    </div>
-  )
-}
-
-function TipRow({ text }: { text: string }) {
-  return (
-    <div
-      className="rounded-b-[2rem] px-5 py-4"
-      style={{ background: 'rgba(180,140,80,0.08)' }}
-    >
-      <div className="mb-1.5 flex items-center gap-1.5">
-        <span className="text-sm">💡</span>
-        <p
-          className="text-[11px] font-bold tracking-[0.18em]"
-          style={{ color: 'var(--accent)' }}
-        >
-          初心者のポイント
-        </p>
-      </div>
-      <p
-        className="text-sm leading-7 font-medium"
-        style={{ color: 'var(--accent-strong)' }}
-      >
-        {text}
-      </p>
     </div>
   )
 }
