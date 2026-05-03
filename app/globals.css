@@ -1,8 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f3eee7;
+  --foreground: #191511;
+  --surface: #fcfaf7;
+  --surface-muted: #f4ede4;
+  --border: #d8cec2;
+  --accent: #74513a;
+  --accent-strong: #2c211a;
+  --ink-soft: #6d6157;
 }
 
 @theme inline {
@@ -12,15 +18,39 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), sans-serif;
+  text-rendering: optimizeLegibility;
+  letter-spacing: -0.01em;
+}
+
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: #e6d0b1;
+  color: #2f2015;
+}
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

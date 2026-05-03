@@ -1,211 +1,162 @@
 import Link from "next/link";
 
+import { APP_NAME, APP_SUBTITLE } from "@/lib/brand";
+import { chapterCatalog, learningTools, recommendedRoute } from "@/lib/curriculum";
+
+const progressSummary = [
+  { label: "理解する章", value: `${chapterCatalog.length}` },
+  { label: "使えるツール", value: `${learningTools.length}` },
+  { label: "次の追加候補", value: "Glossary / Quiz / Flavor" },
+];
+
 export default function LearnPage() {
-  const chapters = [
-    {
-      number: "01",
-      title: "コーヒーチェリーを知る",
-      emoji: "🍒",
-      description: "コーヒーの実の構造と、生産地の環境について学ぼう",
-      color: "bg-red-50 border-red-200",
-      badge: "bg-red-100 text-red-700",
-    },
-    {
-      number: "02",
-      title: "精製方法を知る",
-      emoji: "☀️",
-      description: "ナチュラル・ウォッシュト・ハニー、それぞれの違いを理解しよう",
-      color: "bg-amber-50 border-amber-200",
-      badge: "bg-amber-100 text-amber-700",
-    },
-    {
-      number: "03",
-      title: "生豆から焙煎へ",
-      emoji: "🔥",
-      description: "焙煎の深さが味わいをどう変えるかを学ぼう",
-      color: "bg-orange-50 border-orange-200",
-      badge: "bg-orange-100 text-orange-700",
-    },
-    {
-      number: "04",
-      title: "挽き目と抽出",
-      emoji: "⚙️",
-      description: "グラインド粒度と抽出方法の関係を理解しよう",
-      color: "bg-yellow-50 border-yellow-200",
-      badge: "bg-yellow-100 text-yellow-700",
-    },
-    {
-      number: "05",
-      title: "一杯のコーヒーができるまで",
-      emoji: "☕",
-      description: "農園から手元のカップまでの旅を一気におさらいしよう",
-      color: "bg-stone-50 border-stone-300",
-      badge: "bg-stone-200 text-stone-700",
-    },
-  ];
-
-  const steps = [
-    {
-      step: "Step 1",
-      title: "チェリーの構造を見る",
-      emoji: "🍒",
-      description: "まずはコーヒーが「果実」であることから始めよう。種・果肉・外皮の役割を理解する。",
-    },
-    {
-      step: "Step 2",
-      title: "精製方法を選んでみる",
-      emoji: "🌿",
-      description: "ナチュラルとウォッシュト、どちらが自分好みかを考えながら違いを学ぶ。",
-    },
-    {
-      step: "Step 3",
-      title: "コーヒーが生豆になる流れを理解する",
-      emoji: "🌱",
-      description: "収穫から精製・乾燥・脱穀まで、生豆になるまでの工程をたどる。",
-    },
-  ];
-
   return (
-    <div className="min-h-screen bg-amber-50">
-      {/* ナビゲーション */}
-      <nav className="bg-white/80 backdrop-blur-sm border-b border-amber-100 sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center gap-3">
-          <Link href="/" className="text-stone-500 hover:text-stone-800 text-sm transition-colors">
-            ← ホームへ
-          </Link>
-          <span className="text-stone-300">|</span>
-          <span className="text-sm font-medium text-amber-800">☕ Coffee Learning Map</span>
-        </div>
-      </nav>
-
-      {/* ヒーローセクション */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-amber-900 via-amber-800 to-stone-800 text-white">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-8 left-12 text-8xl rotate-12">☕</div>
-          <div className="absolute top-16 right-20 text-6xl -rotate-6">🍒</div>
-          <div className="absolute bottom-12 left-1/4 text-7xl rotate-3">🌿</div>
-          <div className="absolute bottom-8 right-16 text-5xl -rotate-12">🔥</div>
-        </div>
-
-        <div className="relative max-w-4xl mx-auto px-4 py-16 md:py-24 text-center">
-          <div className="inline-flex items-center gap-2 bg-amber-700/60 rounded-full px-4 py-1.5 mb-6 text-amber-200 text-sm font-medium border border-amber-600/50">
-            <span>📚</span>
-            <span>コーヒー学習マップ</span>
-          </div>
-
-          <h1 className="text-4xl md:text-6xl font-bold mb-4 tracking-tight">
-            Coffee Learning Map
-          </h1>
-          <p className="text-lg md:text-xl text-amber-200 max-w-xl mx-auto leading-relaxed">
-            一杯のコーヒーができるまでを、<br className="hidden sm:block" />
-            地図のように楽しく学ぶ
-          </p>
-
-          <div className="flex items-center justify-center gap-2 mt-10">
-            {["01", "02", "03", "04", "05"].map((n) => (
-              <div key={n} className="flex flex-col items-center gap-1">
-                <div className="w-8 h-8 rounded-full bg-amber-700/60 border border-amber-500/50 flex items-center justify-center text-xs font-bold text-amber-200">
-                  {n}
-                </div>
-              </div>
-            ))}
-          </div>
-          <p className="text-amber-400 text-xs mt-3">5つの章で構成されています</p>
-        </div>
-      </section>
-
-      <div className="max-w-4xl mx-auto px-4 py-12 space-y-16">
-
-        {/* 学習マップ */}
-        <section>
-          <div className="flex items-center gap-3 mb-6">
-            <span className="text-2xl">🗺️</span>
+    <div className="min-h-screen bg-[linear-gradient(180deg,#f6f0e7_0%,#efe5d8_100%)]">
+      <main className="mx-auto max-w-7xl px-4 py-6 md:px-6 md:py-10">
+        <section className="rounded-[2.25rem] border border-[var(--border)] bg-[linear-gradient(135deg,#fcfaf7_0%,#f3ebdf_100%)] p-6 shadow-[0_30px_80px_rgba(54,36,20,0.08)] md:p-8">
+          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
             <div>
-              <h2 className="text-xl font-bold text-stone-800">学習マップ</h2>
-              <p className="text-sm text-stone-500">5つの章でコーヒーの全体像をつかもう</p>
-            </div>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            {chapters.map((ch, i) => (
-              <div
-                key={ch.number}
-                className={`rounded-2xl border-2 p-5 transition-all hover:shadow-md hover:-translate-y-0.5 cursor-pointer ${ch.color} ${i === 4 ? "sm:col-span-2" : ""}`}
-              >
-                <div className="flex items-start gap-4">
-                  <div className="text-3xl">{ch.emoji}</div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${ch.badge}`}>
-                        Chapter {ch.number}
-                      </span>
-                    </div>
-                    <h3 className="font-bold text-stone-800 mb-1">{ch.title}</h3>
-                    <p className="text-sm text-stone-600 leading-relaxed">{ch.description}</p>
-                  </div>
-                </div>
+              <Link href="/" className="text-sm font-semibold text-stone-500 hover:text-stone-800">
+                ← ホームへ
+              </Link>
+              <div className="mt-4">
+                <p className="text-xs font-bold tracking-[0.34em] text-stone-500">{APP_NAME}</p>
+                <p className="mt-1 text-[11px] uppercase tracking-[0.22em] text-stone-400">{APP_SUBTITLE}</p>
               </div>
-            ))}
+              <h1 className="mt-5 text-4xl font-black leading-tight tracking-tight text-[var(--accent-strong)] md:text-5xl">
+                農園からカップまでを
+                <br />
+                順番に理解する学習マップ
+              </h1>
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--ink-soft)] md:text-base">
+                今どの工程を学んでいるのか、次に何を見れば理解が深まるのかを迷わずたどれるようにした画面です。
+              </p>
+
+              <div className="mt-6 flex flex-wrap gap-3">
+                {progressSummary.map((item) => (
+                  <div key={item.label} className="rounded-2xl border border-stone-200 bg-white/75 px-4 py-3">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-stone-400">{item.label}</p>
+                    <p className="mt-1 text-sm font-bold text-stone-900">{item.value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-[1.9rem] border border-stone-200 bg-white/72 p-5 backdrop-blur">
+              <p className="text-xs font-bold tracking-[0.18em] text-stone-500">おすすめルート</p>
+              <div className="mt-4 space-y-3">
+                {recommendedRoute.map((step, index) => (
+                  <Link
+                    key={step.label}
+                    href={step.href}
+                    className="group flex gap-4 rounded-2xl border border-stone-200 bg-stone-50/80 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:shadow-md"
+                  >
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[var(--accent-strong)] text-sm font-bold text-white">
+                      {index + 1}
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-stone-400">{step.label}</p>
+                      <p className="mt-1 text-base font-bold text-stone-900">{step.title}</p>
+                      <p className="mt-1 text-sm leading-6 text-stone-600">{step.description}</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
 
-        {/* おすすめ学習ルート */}
-        <section>
-          <div className="flex items-center gap-3 mb-6">
-            <span className="text-2xl">✨</span>
-            <div>
-              <h2 className="text-xl font-bold text-stone-800">まず学ぶべきおすすめルート</h2>
-              <p className="text-sm text-stone-500">初めてなら、このステップで始めよう</p>
+        <section className="mt-8 grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
+          <div className="rounded-[2rem] border border-[var(--border)] bg-[var(--surface)] p-6 md:p-8">
+            <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+              <div>
+                <p className="text-xs font-bold tracking-[0.18em] text-stone-500">Journey map</p>
+                <h2 className="mt-3 text-3xl font-black tracking-tight text-stone-900">章ごとの学習フロー</h2>
+              </div>
+              <p className="max-w-xl text-sm leading-6 text-stone-500">
+                各章は問い、学習ゴール、使うUIまで整理してあり、どこをどう学ぶかが分かります。
+              </p>
             </div>
-          </div>
 
-          <div className="relative">
-            <div className="absolute left-6 top-12 bottom-12 w-0.5 bg-amber-200 hidden sm:block" />
-
-            <div className="space-y-4">
-              {steps.map((item, i) => (
-                <div key={item.step} className="relative flex gap-4 sm:gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-amber-800 text-white flex items-center justify-center font-bold text-sm z-10 shadow-md">
-                    {i + 1}
+            <div className="mt-6 space-y-4">
+              {chapterCatalog.map((chapter, index) => (
+                <Link
+                  key={chapter.id}
+                  href={chapter.href}
+                  className="grid gap-4 rounded-[1.65rem] border border-stone-200 bg-white p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md md:grid-cols-[96px_1fr_auto] md:items-center"
+                >
+                  <div>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-stone-400">{chapter.theme}</p>
+                    <p className="mt-1 text-3xl font-black tracking-tight text-[var(--accent-strong)]">{chapter.number}</p>
                   </div>
-                  <div className="flex-1 bg-white rounded-2xl border border-amber-100 p-4 shadow-sm hover:shadow-md transition-shadow">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span>{item.emoji}</span>
-                      <span className="text-xs font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">
-                        {item.step}
-                      </span>
+
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">{chapter.emoji}</span>
+                      <h3 className="text-xl font-black tracking-tight text-stone-900">{chapter.title}</h3>
                     </div>
-                    <h3 className="font-bold text-stone-800 mb-1">{item.title}</h3>
-                    <p className="text-sm text-stone-600 leading-relaxed">{item.description}</p>
+                    <p className="mt-2 text-sm leading-6 text-stone-600">{chapter.summary}</p>
+                    <p className="mt-3 text-xs font-semibold text-stone-500">問い: {chapter.question}</p>
+                    <p className="mt-2 text-xs leading-5 text-stone-500">学習ゴール: {chapter.outcome}</p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {chapter.formats.map((format) => (
+                        <span key={format} className="rounded-full bg-stone-100 px-2.5 py-1 text-[11px] font-semibold text-stone-600">
+                          {format}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
+
+                  <div className="flex items-center gap-3 md:flex-col md:items-end">
+                    <span className="rounded-full bg-stone-100 px-3 py-1 text-xs font-semibold text-stone-600">
+                      {chapter.estimatedMinutes} min
+                    </span>
+                    <span className="text-sm font-bold text-[var(--accent)]">
+                      {index === 0 ? "ここから始める →" : "開く →"}
+                    </span>
+                  </div>
+                </Link>
               ))}
             </div>
           </div>
-        </section>
 
-        {/* CTA */}
-        <section className="bg-gradient-to-r from-amber-800 to-stone-700 rounded-3xl p-8 md:p-10 text-center text-white">
-          <div className="text-4xl mb-4">🚀</div>
-          <h2 className="text-2xl font-bold mb-2">さっそく学び始めよう</h2>
-          <p className="text-amber-200 text-sm mb-8">
-            まずはコーヒーチェリーの構造から。知れば知るほど、一杯が深くなる。
-          </p>
+          <div className="space-y-6">
+            <section className="rounded-[2rem] border border-[var(--border)] bg-[var(--surface)] p-6">
+              <p className="text-xs font-bold tracking-[0.18em] text-stone-500">Interactive tools</p>
+              <h2 className="mt-3 text-2xl font-black tracking-tight text-stone-900">触って理解する機能</h2>
+              <div className="mt-5 space-y-3">
+                {learningTools.map((tool) => (
+                  <Link
+                    key={tool.title}
+                    href={tool.href}
+                    className="group flex items-start justify-between gap-4 rounded-2xl border border-stone-200 bg-white p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+                  >
+                    <div>
+                      <span className="rounded-full bg-stone-100 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-stone-500">
+                        {tool.badge}
+                      </span>
+                      <p className="mt-3 text-base font-bold text-stone-900">{tool.title}</p>
+                      <p className="mt-1 text-sm leading-6 text-stone-600">{tool.description}</p>
+                    </div>
+                    <span className="mt-1 text-xl text-stone-300 transition-colors group-hover:text-[var(--accent)]">›</span>
+                  </Link>
+                ))}
+              </div>
+            </section>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/learn/cherry" className="bg-white text-amber-900 font-bold px-6 py-3 rounded-full hover:bg-amber-50 transition-colors shadow-md text-sm text-center">
-              🍒 チェリーの構造を学ぶ
-            </Link>
-            <Link href="/learn/processing-simulator" className="bg-amber-700/60 text-white font-bold px-6 py-3 rounded-full hover:bg-amber-700/80 transition-colors border border-amber-500/50 text-sm text-center">
-              ☀️ 精製方法シミュレーターへ
-            </Link>
+            <section className="rounded-[2rem] border border-[var(--border)] bg-[var(--accent-strong)] p-6 text-white">
+              <p className="text-xs font-bold tracking-[0.18em] text-stone-300">Next additions</p>
+              <h2 className="mt-3 text-2xl font-black tracking-tight">次に追加する学習体験</h2>
+              <div className="mt-5 space-y-3 text-sm leading-6 text-stone-200">
+                <p>・精製比較シミュレーターの拡張</p>
+                <p>・焙煎度スライダーと味変化チャート</p>
+                <p>・抽出パラメーター実験室</p>
+                <p>・フレーバートレーニングと復習クイズ</p>
+              </div>
+            </section>
           </div>
         </section>
-
-        <footer className="text-center text-stone-400 text-xs pb-8">
-          <p>Coffee Textbook — コーヒーを、もっと深く楽しむために</p>
-        </footer>
-      </div>
+      </main>
     </div>
   );
 }

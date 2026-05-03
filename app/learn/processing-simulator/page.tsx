@@ -3,6 +3,8 @@
 import Link from 'next/link'
 import { useState } from 'react'
 
+import { APP_NAME, APP_SUBTITLE } from '@/lib/brand'
+
 type StepId = 'start' | 'no_depulp' | 'depulped'
 type ResultId = 'natural' | 'anaerobic' | 'washed' | 'honey' | 'wet_hull'
 
@@ -27,91 +29,93 @@ type Step = {
   choices: Choice[]
 }
 
-const STEPS: Record<StepId, Step> = {
-  start: {
-    id: 'start',
-    question: '収穫したチェリー、まず何をしますか？',
-    hint: 'この最初の判断が精製方法の大きな分岐点です',
-    choices: [
-      {
-        id: 'no_depulp',
-        emoji: '🍒',
-        label: 'チェリーのまま処理する',
-        sublabel: '果肉を残したまま次の工程へ',
-        next: 'no_depulp',
-      },
-      {
-        id: 'depulped',
-        emoji: '⚙️',
-        label: '果肉を取り除く（パルピング）',
-        sublabel: 'パルパーで外皮・果肉を除去する',
-        next: 'depulped',
-      },
-    ],
-  },
-  no_depulp: {
-    id: 'no_depulp',
-    question: 'チェリーをどのように処理しますか？',
-    hint: '発酵環境によって風味が大きく変わります',
-    choices: [
-      {
-        id: 'natural',
-        emoji: '☀️',
-        label: '天日で乾燥させる',
-        sublabel: '空気中でゆっくり乾燥・発酵させる',
-        next: 'natural',
-      },
-      {
-        id: 'anaerobic',
-        emoji: '🔒',
-        label: '密閉タンクで嫌気発酵させる',
-        sublabel: '酸素を遮断した環境でコントロール発酵',
-        next: 'anaerobic',
-      },
-    ],
-  },
-  depulped: {
-    id: 'depulped',
-    question: '果肉除去後、ミューシレージ（粘液質）はどうしますか？',
-    hint: 'ミューシレージの残し方が甘みと酸のバランスを左右します',
-    choices: [
-      {
-        id: 'washed',
-        emoji: '💧',
-        label: '水洗いして完全に除去する',
-        sublabel: '発酵タンクで洗い流しクリーンな豆に',
-        next: 'washed',
-      },
-      {
-        id: 'honey',
-        emoji: '🍯',
-        label: '一部または全部残したまま乾燥する',
-        sublabel: 'ねっとりした甘みを豆に移す',
-        next: 'honey',
-      },
-      {
-        id: 'wet_hull',
-        emoji: '💦',
-        label: '湿ったまま脱穀する（パーチメント除去）',
-        sublabel: '水分が高い状態でハルを取り除く',
-        next: 'wet_hull',
-      },
-    ],
-  },
-}
-
 type Result = {
   id: ResultId
   name: string
   emoji: string
   tagline: string
   description: string
+  whyItLands: string
   flavorNotes: string[]
   regions: string[]
-  cardBg: string
-  cardBorder: string
+  nextStudyHref: string
+  nextStudyLabel: string
+  toneClass: string
   badgeClass: string
   tagClass: string
+}
+
+const STEPS: Record<StepId, Step> = {
+  start: {
+    id: 'start',
+    question: '収穫したチェリー、まず何をしますか？',
+    hint: '最初に果肉を残すかどうかで、精製方法の大きな方向が決まります。',
+    choices: [
+      {
+        id: 'no_depulp',
+        emoji: '🍒',
+        label: 'チェリーのまま処理する',
+        sublabel: '果肉を残したまま乾燥や発酵に進む',
+        next: 'no_depulp',
+      },
+      {
+        id: 'depulped',
+        emoji: '⚙️',
+        label: '果肉を取り除く',
+        sublabel: 'パルピングして次の工程に進む',
+        next: 'depulped',
+      },
+    ],
+  },
+  no_depulp: {
+    id: 'no_depulp',
+    question: '果肉を残したチェリーをどう扱いますか？',
+    hint: '空気があるか、ないかで発酵の進み方が変わります。',
+    choices: [
+      {
+        id: 'natural',
+        emoji: '☀️',
+        label: 'そのまま乾燥させる',
+        sublabel: '天日でゆっくり乾燥させる',
+        next: 'natural',
+      },
+      {
+        id: 'anaerobic',
+        emoji: '🔒',
+        label: '密閉して嫌気発酵させる',
+        sublabel: '酸素を遮断して発酵をコントロールする',
+        next: 'anaerobic',
+      },
+    ],
+  },
+  depulped: {
+    id: 'depulped',
+    question: '果肉除去後のミューシレージをどうしますか？',
+    hint: '残す量によって甘みやクリーンさの出方が変わります。',
+    choices: [
+      {
+        id: 'washed',
+        emoji: '💧',
+        label: 'きれいに洗い流す',
+        sublabel: 'クリーンで透明感のある方向に寄せる',
+        next: 'washed',
+      },
+      {
+        id: 'honey',
+        emoji: '🍯',
+        label: '残したまま乾燥させる',
+        sublabel: '甘さや厚みを残しやすい',
+        next: 'honey',
+      },
+      {
+        id: 'wet_hull',
+        emoji: '💦',
+        label: '湿った段階で脱穀する',
+        sublabel: 'ウェットハル特有の重さにつながる',
+        next: 'wet_hull',
+      },
+    ],
+  },
 }
 
 const RESULTS: Record<ResultId, Result> = {
@@ -119,13 +123,16 @@ const RESULTS: Record<ResultId, Result> = {
     id: 'natural',
     name: 'ナチュラル',
     emoji: '☀️',
-    tagline: '果実の甘みをそのまま豆へ',
+    tagline: '果実の甘みをそのまま豆へ移す',
     description:
-      'チェリーを丸ごと乾燥させることで、果肉の甘みや果実フレーバーが生豆に染み込む。エチオピアやブラジルで広く行われる伝統的な精製法。',
-    flavorNotes: ['フルーティー', 'ワインのような', '甘くて濃厚', 'ベリー系'],
+      'チェリーを丸ごと乾燥させることで、果肉の甘みや果実感が豆に移りやすい精製方法です。フルーティーで厚みのある味になりやすく、個性が分かりやすく出ます。',
+    whyItLands:
+      '果肉を残したまま乾燥させる選択をしたため、果実由来の糖や香りが豆に移りやすいルートに進みました。',
+    flavorNotes: ['フルーティー', 'ベリー感', '濃厚', '甘い余韻'],
     regions: ['エチオピア', 'ブラジル', 'イエメン'],
-    cardBg: 'bg-orange-50',
-    cardBorder: 'border-orange-300',
+    nextStudyHref: '/learn/roasting',
+    nextStudyLabel: 'この個性を焙煎でどう残すか学ぶ',
+    toneClass: 'border-orange-200 bg-orange-50',
     badgeClass: 'bg-orange-100 text-orange-800',
     tagClass: 'bg-orange-200 text-orange-800',
   },
@@ -133,55 +140,67 @@ const RESULTS: Record<ResultId, Result> = {
     id: 'anaerobic',
     name: 'アナエロビック',
     emoji: '🔒',
-    tagline: '酸素なしの密閉発酵で生まれる個性',
+    tagline: '密閉発酵で個性を強く引き出す',
     description:
-      'チェリーを密閉タンクに入れ、酸素のない環境でコントロールした発酵を行う。温度・時間・圧力を管理することで独特の風味を引き出す革新的な手法。',
-    flavorNotes: ['トロピカル', '複雑な発酵感', '独特の甘み', '実験的'],
+      '酸素のない環境で発酵をコントロールする方法です。発酵由来の華やかさや複雑さが出やすく、実験的で印象の強い味につながります。',
+    whyItLands:
+      '果肉を残したうえで酸素を遮断する選択をしたため、発酵感の強い個性的なルートに進みました。',
+    flavorNotes: ['トロピカル', '複雑', '発酵感', '強い甘み'],
     regions: ['コスタリカ', 'コロンビア', 'ブラジル'],
-    cardBg: 'bg-purple-50',
-    cardBorder: 'border-purple-300',
-    badgeClass: 'bg-purple-100 text-purple-800',
-    tagClass: 'bg-purple-200 text-purple-800',
+    nextStudyHref: '/learn/roasting',
+    nextStudyLabel: '発酵感を焙煎でどう扱うか学ぶ',
+    toneClass: 'border-fuchsia-200 bg-fuchsia-50',
+    badgeClass: 'bg-fuchsia-100 text-fuchsia-800',
+    tagClass: 'bg-fuchsia-200 text-fuchsia-800',
   },
   washed: {
     id: 'washed',
     name: 'ウォッシュド',
     emoji: '💧',
-    tagline: 'クリーンでクリアな豆本来の味',
+    tagline: 'クリーンで豆本来の輪郭が見えやすい',
     description:
-      '果肉除去後に発酵タンクで水洗いし、ミューシレージを完全に取り除く。豆本来の風味が際立ちやすく、クリーンカップと呼ばれる透明感のある味わいが特徴。',
-    flavorNotes: ['クリーン', 'フローラル', '明るい酸', 'テロワールが出やすい'],
-    regions: ['エチオピア（イルガチェフェ）', 'ケニア', 'コロンビア'],
-    cardBg: 'bg-blue-50',
-    cardBorder: 'border-blue-300',
-    badgeClass: 'bg-blue-100 text-blue-800',
-    tagClass: 'bg-blue-200 text-blue-800',
+      '果肉除去後にミューシレージを洗い流すことで、透明感のある味になりやすい精製方法です。産地や品種の違いも感じ取りやすくなります。',
+    whyItLands:
+      '果肉除去後にミューシレージも洗い流したため、付着物の影響が少ないクリーンな方向に進みました。',
+    flavorNotes: ['クリーン', 'フローラル', '明るい酸', '透明感'],
+    regions: ['エチオピア', 'ケニア', 'コロンビア'],
+    nextStudyHref: '/learn/roasting',
+    nextStudyLabel: 'クリーンな豆の焙煎変化を見る',
+    toneClass: 'border-sky-200 bg-sky-50',
+    badgeClass: 'bg-sky-100 text-sky-800',
+    tagClass: 'bg-sky-200 text-sky-800',
   },
   honey: {
     id: 'honey',
     name: 'ハニー',
     emoji: '🍯',
-    tagline: 'ミューシレージが甘みの橋渡し',
+    tagline: '甘みとやわらかさを残しやすい',
     description:
-      '果肉を除去した後、ミューシレージを残したまま乾燥させる。残す量（ブラック・レッド・イエロー・ホワイトハニー）によって甘みと酸のバランスが変わる。',
-    flavorNotes: ['甘い', '柔らかい酸', 'ナッツ感', 'まろやか'],
+      '果肉除去後もミューシレージを残して乾燥させる方法です。ウォッシュドより甘みや厚みが出やすく、バランスのよい飲みやすさにつながります。',
+    whyItLands:
+      '果肉は取り除きつつミューシレージを残したため、クリーンさよりも甘さとやわらかさを保ちやすい方向に進みました。',
+    flavorNotes: ['甘い', 'やわらかい酸', 'ナッツ感', 'まろやか'],
     regions: ['コスタリカ', 'エルサルバドル', 'ブラジル'],
-    cardBg: 'bg-yellow-50',
-    cardBorder: 'border-yellow-300',
-    badgeClass: 'bg-yellow-100 text-yellow-800',
-    tagClass: 'bg-yellow-200 text-yellow-800',
+    nextStudyHref: '/learn/roasting',
+    nextStudyLabel: '甘みを焙煎でどう広げるか学ぶ',
+    toneClass: 'border-amber-200 bg-amber-50',
+    badgeClass: 'bg-amber-100 text-amber-800',
+    tagClass: 'bg-amber-200 text-amber-800',
   },
   wet_hull: {
     id: 'wet_hull',
-    name: 'ウェットハル（ギリン・バサー）',
+    name: 'ウェットハル',
     emoji: '💦',
-    tagline: 'インドネシア発、独特のボディ感',
+    tagline: '重いボディと独特の質感を生みやすい',
     description:
-      '水分が高い状態（40〜50%）でパーチメントを除去し、その後さらに乾燥させる。スマトラ式とも呼ばれ、重厚なボディとアーシーな風味が生まれる独特の手法。',
-    flavorNotes: ['ボディ感が強い', 'アーシー', 'ハーブ的', 'スパイシー'],
-    regions: ['インドネシア（スマトラ）', 'スラウェシ', 'フローレス'],
-    cardBg: 'bg-teal-50',
-    cardBorder: 'border-teal-300',
+      '水分が高い段階で脱穀する、インドネシアで有名な手法です。ボディ感が強く、アーシーで重ための方向に進みやすい特徴があります。',
+    whyItLands:
+      '十分に乾かし切る前に脱穀する選択をしたため、ウェットハル特有の重いボディ感につながるルートに進みました。',
+    flavorNotes: ['重いボディ', 'アーシー', 'ハーブ感', 'スパイシー'],
+    regions: ['スマトラ', 'スラウェシ', 'フローレス'],
+    nextStudyHref: '/learn/brewing',
+    nextStudyLabel: '重いボディを抽出でどう整えるか学ぶ',
+    toneClass: 'border-teal-200 bg-teal-50',
     badgeClass: 'bg-teal-100 text-teal-800',
     tagClass: 'bg-teal-200 text-teal-800',
   },
@@ -189,8 +208,8 @@ const RESULTS: Record<ResultId, Result> = {
 
 const STEP_LABELS: Record<StepId, string> = {
   start: '最初の処理',
-  no_depulp: '果肉残し後の工程',
-  depulped: 'パルピング後の工程',
+  no_depulp: '果肉を残した後の選択',
+  depulped: '果肉除去後の選択',
 }
 
 const RESULT_IDS = new Set<string>(['natural', 'anaerobic', 'washed', 'honey', 'wet_hull'])
@@ -205,7 +224,7 @@ export default function ProcessingSimulatorPage() {
   const [history, setHistory] = useState<HistoryItem[]>([])
 
   const handleChoice = (choice: Choice) => {
-    setHistory(prev => [
+    setHistory((prev) => [
       ...prev,
       {
         stepLabel: STEP_LABELS[currentStep],
@@ -213,11 +232,13 @@ export default function ProcessingSimulatorPage() {
         choiceEmoji: choice.emoji,
       },
     ])
+
     if (isResultId(choice.next)) {
       setResult(choice.next)
-    } else {
-      setCurrentStep(choice.next as StepId)
+      return
     }
+
+    setCurrentStep(choice.next)
   }
 
   const reset = () => {
@@ -228,179 +249,178 @@ export default function ProcessingSimulatorPage() {
 
   const step = STEPS[currentStep]
   const resultData = result ? RESULTS[result] : null
+  const totalSteps = result ? history.length : history.length + 1
 
   return (
-    <div className="min-h-screen bg-amber-50">
-      {/* ナビゲーション */}
-      <nav className="bg-white/80 backdrop-blur-sm border-b border-amber-100 sticky top-0 z-10">
-        <div className="max-w-lg mx-auto px-4 py-3 flex items-center gap-3">
-          <Link href="/learn" className="text-stone-500 hover:text-stone-800 text-sm transition-colors">
-            ← 学習マップへ
-          </Link>
-          <span className="text-stone-300">|</span>
-          <span className="text-sm font-medium text-amber-700">☀️ Chapter 02</span>
-        </div>
-      </nav>
-
-      <div className="max-w-lg mx-auto px-4 py-8">
-
-        {/* ヘッダー */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 bg-amber-100 text-amber-800 px-3 py-1.5 rounded-full text-xs font-bold mb-3">
-            <span>☀️</span>
-            <span>Chapter 02 · 精製方法を知る</span>
-          </div>
-          <h1 className="text-2xl font-bold text-stone-800 mb-2">
-            精製方法シミュレーター
-          </h1>
-          <p className="text-stone-500 text-sm">
-            選択肢を選んでいくと、どの精製方法にたどり着くかわかります
-          </p>
-        </div>
-
-        {/* タイムライン（選択履歴） */}
-        {history.length > 0 && (
-          <div className="mb-6">
-            <p className="text-xs font-bold text-stone-400 tracking-wider mb-3">📋 あなたの選択履歴</p>
-            <div className="space-y-2">
-              {history.map((item, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-amber-800 text-white flex items-center justify-center text-xs font-bold mt-0.5">
-                    {i + 1}
-                  </div>
-                  <div className="flex-1 bg-white rounded-xl border border-stone-100 px-3 py-2 shadow-sm">
-                    <p className="text-xs text-stone-400 mb-0.5">{item.stepLabel}</p>
-                    <p className="text-sm font-medium text-stone-700">
-                      {item.choiceEmoji} {item.choiceLabel}
-                    </p>
-                  </div>
+    <div className="min-h-screen bg-[linear-gradient(180deg,#f7f1e9_0%,#efe6db_100%)]">
+      <main className="mx-auto max-w-6xl px-4 py-6 md:px-6 md:py-10">
+        <section className="rounded-[2rem] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_20px_60px_rgba(58,35,20,0.08)] md:p-8">
+          <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
+            <aside className="space-y-4">
+              <div className="rounded-[1.5rem] border border-stone-200 bg-stone-50 p-5">
+                <Link href="/learn" className="text-sm font-semibold text-stone-500 hover:text-stone-800">
+                  ← 学習マップへ
+                </Link>
+                <div className="mt-4">
+                  <p className="text-xs font-bold tracking-[0.28em] text-stone-500">{APP_NAME}</p>
+                  <p className="mt-1 text-[11px] uppercase tracking-[0.18em] text-stone-400">{APP_SUBTITLE}</p>
                 </div>
-              ))}
-              {resultData && (
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-green-600 text-white flex items-center justify-center text-xs font-bold mt-0.5">
-                    ✓
-                  </div>
-                  <div className={`flex-1 rounded-xl border px-3 py-2 ${resultData.cardBg} ${resultData.cardBorder}`}>
-                    <p className="text-xs text-stone-500 mb-0.5">結果</p>
-                    <p className="text-sm font-bold text-stone-800">
-                      {resultData.emoji} {resultData.name}
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* ステップ or 結果カード */}
-        {!result ? (
-          <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-6">
-            <div className="mb-5">
-              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
-                Step {history.length + 1}
-              </span>
-              <h2 className="text-base font-bold text-stone-800 leading-relaxed mt-2">
-                {step.question}
-              </h2>
-              {step.hint && (
-                <p className="text-xs text-stone-400 mt-1">{step.hint}</p>
-              )}
-            </div>
-
-            <div className="space-y-3">
-              {step.choices.map(choice => (
-                <button
-                  key={choice.id}
-                  onClick={() => handleChoice(choice)}
-                  className="w-full flex items-start gap-4 bg-amber-50 hover:bg-amber-100 active:bg-amber-200 border border-amber-200 hover:border-amber-400 rounded-xl p-4 text-left transition-all duration-150 group"
-                >
-                  <span className="text-2xl mt-0.5 flex-shrink-0">{choice.emoji}</span>
-                  <div className="flex-1">
-                    <p className="font-bold text-stone-800 text-sm group-hover:text-amber-900">
-                      {choice.label}
-                    </p>
-                    {choice.sublabel && (
-                      <p className="text-xs text-stone-500 mt-0.5">{choice.sublabel}</p>
-                    )}
-                  </div>
-                  <span className="text-stone-300 group-hover:text-amber-600 text-lg mt-0.5 flex-shrink-0">›</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div className={`rounded-2xl border-2 p-6 shadow-md ${resultData!.cardBg} ${resultData!.cardBorder}`}>
-            <div className="text-center mb-5">
-              <div className="text-5xl mb-3">{resultData!.emoji}</div>
-              <span className={`text-xs font-bold px-3 py-1 rounded-full ${resultData!.badgeClass}`}>
-                あなたの精製方法
-              </span>
-              <h2 className="text-2xl font-bold text-stone-800 mt-3 mb-1">{resultData!.name}</h2>
-              <p className="text-sm text-stone-600 italic">{resultData!.tagline}</p>
-            </div>
-
-            <p className="text-sm text-stone-700 leading-relaxed mb-5">{resultData!.description}</p>
-
-            <div className="space-y-4 mb-6">
-              <div>
-                <p className="text-xs font-bold text-stone-500 tracking-wider mb-2">☕ フレーバーの特徴</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {resultData!.flavorNotes.map(note => (
-                    <span key={note} className={`text-xs font-medium px-2.5 py-1 rounded-full ${resultData!.tagClass}`}>
-                      {note}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <p className="text-xs font-bold text-stone-500 tracking-wider mb-2">🌍 主な産地</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {resultData!.regions.map(region => (
-                    <span key={region} className="text-xs font-medium px-2.5 py-1 rounded-full bg-stone-100 text-stone-700">
-                      {region}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <button
-                onClick={reset}
-                className="w-full bg-amber-800 hover:bg-amber-900 active:bg-amber-950 text-white font-bold py-3 px-6 rounded-full transition-colors text-sm"
-              >
-                🔄 もう一度試す
-              </button>
-              <Link
-                href="/learn"
-                className="w-full bg-white hover:bg-stone-50 text-stone-700 font-bold py-3 px-6 rounded-full transition-colors text-sm text-center border border-stone-200"
-              >
-                ← Learning Map に戻る
-              </Link>
-            </div>
-          </div>
-        )}
-
-        {/* 学習ポイント（ステップ中のみ表示） */}
-        {!result && (
-          <div className="bg-amber-800 text-white rounded-2xl p-5 mt-6">
-            <div className="flex items-start gap-3">
-              <span className="text-2xl mt-0.5 flex-shrink-0">💡</span>
-              <div>
-                <p className="text-amber-300 text-xs font-bold tracking-wider mb-1.5">学習のポイント</p>
-                <p className="font-bold leading-relaxed text-sm">
-                  精製方法はコーヒーの味わいを大きく左右します。全5種類の精製方法にたどり着けるか試してみよう。
+                <p className="mt-4 text-xs font-bold tracking-[0.18em] text-stone-500">CHAPTER 02</p>
+                <h1 className="mt-2 text-2xl font-black tracking-tight text-[var(--accent-strong)]">
+                  精製方法を選んで学ぶ
+                </h1>
+                <p className="mt-3 text-sm leading-7 text-[var(--ink-soft)]">
+                  果肉を残すか、水で洗うか、密閉発酵させるか。選択の違いが、最後の味にどうつながるかを整理します。
                 </p>
               </div>
-            </div>
-          </div>
-        )}
 
-        <footer className="text-center text-stone-400 text-xs py-8">
-          <p>Coffee Textbook — コーヒーを、もっと深く楽しむために</p>
-        </footer>
-      </div>
+              <div className="rounded-[1.5rem] border border-stone-200 bg-white p-5">
+                <p className="text-xs font-bold tracking-[0.18em] text-stone-500">今の学習ポイント</p>
+                <p className="mt-3 text-sm font-bold text-stone-900">
+                  {result ? '選択の結果から特徴を理解する段階です。' : step.question}
+                </p>
+                <p className="mt-2 text-sm leading-6 text-stone-600">
+                  {result ? 'どの選択がどの精製方法につながったかを確認して、味との関係を覚えます。' : step.hint}
+                </p>
+                <div className="mt-4 rounded-full bg-stone-100 p-1">
+                  <div
+                    className="h-2 rounded-full bg-[var(--accent)] transition-all"
+                    style={{ width: `${Math.min((totalSteps / 3) * 100, 100)}%` }}
+                  />
+                </div>
+                <p className="mt-2 text-xs text-stone-500">学習の進行: {Math.min(totalSteps, 3)} / 3</p>
+              </div>
+
+              {history.length > 0 && (
+                <div className="rounded-[1.5rem] border border-stone-200 bg-white p-5">
+                  <p className="text-xs font-bold tracking-[0.18em] text-stone-500">選択履歴</p>
+                  <div className="mt-4 space-y-3">
+                    {history.map((item, index) => (
+                      <div key={`${item.stepLabel}-${index}`} className="rounded-2xl bg-stone-50 p-3">
+                        <p className="text-xs text-stone-500">{item.stepLabel}</p>
+                        <p className="mt-1 text-sm font-bold text-stone-900">
+                          {item.choiceEmoji} {item.choiceLabel}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </aside>
+
+            <section>
+              {!result ? (
+                <div className="rounded-[1.75rem] border border-stone-200 bg-white p-6 md:p-8">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-xs font-bold tracking-[0.18em] text-stone-500">
+                        STEP {history.length + 1}
+                      </p>
+                      <h2 className="mt-2 text-2xl font-black tracking-tight text-stone-900">
+                        {step.question}
+                      </h2>
+                    </div>
+                    <span className="rounded-full bg-stone-100 px-3 py-1 text-xs font-semibold text-stone-600">
+                      {STEP_LABELS[currentStep]}
+                    </span>
+                  </div>
+
+                  <div className="mt-6 grid gap-3">
+                    {step.choices.map((choice) => (
+                      <button
+                        key={choice.id}
+                        onClick={() => handleChoice(choice)}
+                        className="rounded-[1.25rem] border border-stone-200 bg-stone-50 p-5 text-left transition-colors hover:border-[var(--accent)] hover:bg-[#f7f2ec]"
+                      >
+                        <div className="flex items-start gap-4">
+                          <span className="text-2xl">{choice.emoji}</span>
+                          <div className="flex-1">
+                            <p className="text-base font-bold text-stone-900">{choice.label}</p>
+                            {choice.sublabel && (
+                              <p className="mt-1 text-sm leading-6 text-stone-600">{choice.sublabel}</p>
+                            )}
+                          </div>
+                          <span className="text-xl text-stone-300">›</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className={`rounded-[1.75rem] border p-6 md:p-8 ${resultData!.toneClass}`}>
+                  <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                    <div>
+                      <span className={`rounded-full px-3 py-1 text-xs font-bold ${resultData!.badgeClass}`}>
+                        あなたがたどり着いた精製方法
+                      </span>
+                      <h2 className="mt-3 text-3xl font-black tracking-tight text-stone-900">
+                        {resultData!.emoji} {resultData!.name}
+                      </h2>
+                      <p className="mt-2 text-sm font-medium text-stone-700">{resultData!.tagline}</p>
+                    </div>
+                    <button
+                      onClick={reset}
+                      className="rounded-full border border-stone-300 bg-white px-4 py-2 text-sm font-bold text-stone-700 transition-colors hover:bg-stone-50"
+                    >
+                      もう一度試す
+                    </button>
+                  </div>
+
+                  <div className="mt-6 grid gap-4">
+                    <div className="rounded-[1.25rem] bg-white/70 p-4">
+                      <p className="text-xs font-bold tracking-[0.18em] text-stone-500">この方法の特徴</p>
+                      <p className="mt-2 text-sm leading-7 text-stone-700">{resultData!.description}</p>
+                    </div>
+
+                    <div className="rounded-[1.25rem] bg-white/70 p-4">
+                      <p className="text-xs font-bold tracking-[0.18em] text-stone-500">なぜこの結果になったか</p>
+                      <p className="mt-2 text-sm leading-7 text-stone-700">{resultData!.whyItLands}</p>
+                    </div>
+
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div className="rounded-[1.25rem] bg-white/70 p-4">
+                        <p className="text-xs font-bold tracking-[0.18em] text-stone-500">風味の特徴</p>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {resultData!.flavorNotes.map((note) => (
+                            <span key={note} className={`rounded-full px-3 py-1 text-xs font-medium ${resultData!.tagClass}`}>
+                              {note}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="rounded-[1.25rem] bg-white/70 p-4">
+                        <p className="text-xs font-bold tracking-[0.18em] text-stone-500">代表的な産地</p>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {resultData!.regions.map((region) => (
+                            <span key={region} className="rounded-full bg-white px-3 py-1 text-xs font-medium text-stone-700">
+                              {region}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-3 pt-2 sm:flex-row">
+                      <Link
+                        href={resultData!.nextStudyHref}
+                        className="rounded-full bg-[var(--accent-strong)] px-5 py-3 text-center text-sm font-bold text-white transition-colors hover:bg-[var(--accent)]"
+                      >
+                        {resultData!.nextStudyLabel}
+                      </Link>
+                      <Link
+                        href="/learn"
+                        className="rounded-full border border-stone-300 bg-white px-5 py-3 text-center text-sm font-bold text-stone-700 transition-colors hover:bg-stone-50"
+                      >
+                        学習マップに戻る
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </section>
+          </div>
+        </section>
+      </main>
     </div>
   )
 }
