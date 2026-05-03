@@ -490,7 +490,7 @@ export default function CherryPage() {
 
           {/* RIGHT — Description card */}
           <div className="mt-6 lg:mt-0">
-            <DescriptionCard layer={layer} />
+            <DescriptionCard key={layer.id} layer={layer} />
 
             {/* Next chapter CTA */}
             <div
@@ -531,7 +531,6 @@ interface DescriptionCardProps {
 function DescriptionCard({ layer }: DescriptionCardProps) {
   return (
     <div
-      key={layer.id}
       className="rounded-[2rem] border"
       style={{
         background: 'var(--surface)',
